@@ -1,0 +1,32 @@
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "Default",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws-us-gov:iam::036436800059:root",
+          "arn:aws-us-gov:iam::067980236515:root"
+        ]
+      },
+      "Action": "ecr:*"
+    },
+	{
+      "Sid": "Default",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws-us-gov:iam::241617614356:root"
+      },
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:DescribeImages",
+        "ecr:DescribeRepositories",
+        "ecr:GetDownloadUrlForLayer",
+		"ecr:GetAuthorizationToken",
+        "ecr:ListImages"
+      ]
+    }	  
+  ]
+}
