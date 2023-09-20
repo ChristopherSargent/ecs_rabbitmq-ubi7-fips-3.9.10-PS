@@ -1,40 +1,33 @@
-FROM ub8:1
+FROM ub7:1
 
 # Install dependencies
-RUN dnf -y update && dnf -y install \
-    openssl-devel \
+RUN yum -y install \
     tar \
-    gcc \
-    perl \
-    ncurses-devel \
     wget \
     procps \
     logrotate \
     unzip \
-    autoconf \
-    m4 \
-    openssl \
     wget \
     make \
     git \
-    socat \
-    less 
+    socat 
 
-# Download and build Erlang 25.2 with FIPS 140-2 compliant cryptography
-RUN wget https://github.com/erlang/otp/archive/OTP-25.2.tar.gz
-RUN tar xvzf OTP-25.2.tar.gz
-WORKDIR otp-OTP-25.2
-RUN ./otp_build configure --with-ssl --enable-fips
-RUN make
-RUN make install
+# Copy RPMS
+COPY openssl-libs-1.0.2k-19.el7.x86_64.rpm /tmp
+COPY openssl-1.0.2k-19.el7.x86_64.rpm /tmp
+COPY erlang-23.2-1.el7_9.x86_64.rpm /tmp
+COPY rabbitmq-server-3.9.10-1.el7.noarch.rpm /tmp
 
-# Download and install RabbitMQ 3.11
-WORKDIR /
-RUN wget https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.11.6/rabbitmq-server-3.11.6-1.el8.noarch.rpm
-RUN rpm -ivh --nodeps rabbitmq-server-3.11.6-1.el8.noarch.rpm
+# Install RPMS
+RUN yum downgrade --nogpgcheck -y /tmp/openssl-libs-1.0.2k-19.el7.x86_64.rpm
+RUN yum install --nogpgcheck -y /tmp/openssl-1.0.2k-19.el7.x86_64.rpm
+RUN rpm -i /tmp/erlang-23.2-1.el7_9.x86_64.rpm
+RUN rpm -i /tmp/rabbitmq-server-3.9.10-1.el7.noarch.rpm
 
-# Set environment variables
-ENV PATH /opt/rabbitmq/sbin:$PATH
+# Install the rest of openssl
+RUN yum -y install \
+    openssl-devel-1.0.2k-26.el7_9.x86_64 \
+    pyOpenSSL-0.13.1-4.el7.x86_64
 
 # Expose the RabbitMQ ports
 EXPOSE 5672 15672
