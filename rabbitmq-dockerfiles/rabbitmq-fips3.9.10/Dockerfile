@@ -11,6 +11,7 @@ ARG APP_VERSION
 ENV HOME="/var/lib/rabbitmq" \
     LANG="C.UTF-8" \
     LANGUAGE="C.UTF-8" \
+    LC_ALL="en_US.UTF-8" \
     RABBITMQ_HOME="/opt/rabbitmq" \
     RABBITMQ_VERSION="${APP_VERSION}" \
     RABBITMQ_DATA_DIR="/var/lib/rabbitmq" \
