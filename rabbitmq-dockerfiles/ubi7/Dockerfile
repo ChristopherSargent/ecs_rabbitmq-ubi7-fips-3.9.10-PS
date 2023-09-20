@@ -9,16 +9,6 @@ COPY scripts/*.sh /dsop-fix/
 
 COPY yum.repos.d/ /etc/yum.repos.d
 
-# CAS tools, install vi, vim and less to make the image more useful
-RUN yum -y update && yum -y install && \
-	vim && \
-	less && \
-	vi 
-#  CAS tools 2, add enablefips.bash and datetime.sh. enablefips.bash allows fips-mode-setup --check to return FIPS mode is enabled. versus default ironback ubi8 which returns FIPS mode is enabled Inconsistent state detected, note this script came from redhat and reference can be found here https://access.redhat.com/discussions/3487481. datetime.sh adds a time stampt to bash history and the terminal and creates a bash alias for ll.
-RUN yum update -y && \
-    /scripts/enablefips.bash && \
-    /scripts/datetime.sh 
-
 COPY banner/issue /etc/
 
 RUN echo Update packages and install DISA STIG fixes && \
@@ -29,9 +19,10 @@ RUN echo Update packages and install DISA STIG fixes && \
     rm -f /etc/yum.repos.d/ubi.repo && \
     yum repolist && \
     yum update -y && \
-    # Do not use loops to iterate through shell scripts, this allows for scripts to fail
-    # but the build to still be successful. Be explicit when executing scripts and ensure
-    # that all scripts have "set -e" at the top of the bash file!
+    chmod +x /dsop-fix/*.sh && \
+    # Do not use loops to iterate through shell dsop-fix, this allows for dsop-fix to fail
+    # but the build to still be successful. Be explicit when executing dsop-fix and ensure
+    # that all dsop-fix have "set -e" at the top of the bash file!
     /dsop-fix/xccdf_org.ssgproject.content_rule_account_disable_post_pw_expiration.sh && \
     /dsop-fix/xccdf_org.ssgproject.content_rule_accounts_logon_fail_delay.sh && \
     /dsop-fix/xccdf_org.ssgproject.content_rule_accounts_max_concurrent_login_sessions.sh && \
@@ -61,6 +52,15 @@ RUN echo Update packages and install DISA STIG fixes && \
     /dsop-fix/xccdf_org.ssgproject.content_rule_rpm_verify_permissions.sh && \
     yum clean all && \
     rm -rf /var/cache/yum/ /var/tmp/* /tmp/* /var/tmp/.???* /tmp/.???*
+
+# CAS tools, install vi, vim and less to make the image more useful
+RUN yum install -y \
+    vim \
+    less
+
+# #  CAS tools 2, add datetime.sh adds a time stampt to bash history and the terminal and creates a bash alias for ll.
+RUN yum update -y && \
+    /dsop-fix/datetime.sh
 
 ENV container oci
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

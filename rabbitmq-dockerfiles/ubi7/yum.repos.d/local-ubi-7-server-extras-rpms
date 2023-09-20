@@ -1,2 +1,1 @@
 https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi/server/7/7Server/$basearch/extras/os
-http://nexus-repository-manager.nexus-repository-manager.svc.cluster.local:8081/repository/ubi-7-extras/
