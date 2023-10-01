@@ -1,0 +1,6 @@
+# ignore certs
+deploy/rabbitmq-config/certs
+
+# ignore deprecated
+deprecated
+

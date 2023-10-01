@@ -1,14 +1,14 @@
 #!/bin/bash
-# Christopher Sargent updated 09202023
+# Christopher Sargent updated 10012023
 set -x #echo on
 
 # dos2unix files
-dos2unix cert.pem chain.pem key.pem rabbitmq.conf advanced.config enabled_plugins
+dos2unix certs/cert.pem certs/chain.pem certs/key.pem rabbitmq.conf advanced.config enabled_plugins
 
 # Copy certs and rabbitmq.conf
-docker cp cert.pem rabbitmq-fips3.9.10:/etc/rabbitmq/
-docker cp chain.pem rabbitmq-fips3.9.10:/etc/rabbitmq/
-docker cp key.pem rabbitmq-fips3.9.10:/etc/rabbitmq/
+docker cp certs/cert.pem rabbitmq-fips3.9.10:/etc/rabbitmq/
+docker cp certs/chain.pem rabbitmq-fips3.9.10:/etc/rabbitmq/
+docker cp certs/key.pem rabbitmq-fips3.9.10:/etc/rabbitmq/
 docker cp rabbitmq.conf rabbitmq-fips3.9.10:/etc/rabbitmq/ 
 docker cp advanced.config rabbitmq-fips3.9.10:/etc/rabbitmq/
 docker cp enabled_plugins rabbitmq-fips3.9.10:/etc/rabbitmq/
@@ -28,6 +28,7 @@ docker exec -u:0 --workdir /etc/rabbitmq/ rabbitmq-fips3.9.10 chown rabbitmq:rab
 docker exec -u:0 --workdir /etc/rabbitmq/ rabbitmq-fips3.9.10 chown rabbitmq:rabbitmq rabbitmq.conf
 docker exec -u:0 --workdir /etc/rabbitmq/ rabbitmq-fips3.9.10 chown rabbitmq:rabbitmq advanced.config
 docker exec -u:0 --workdir /etc/rabbitmq/ rabbitmq-fips3.9.10 chown rabbitmq:rabbitmq enabled_plugins
+docker exec -u:0 --workdir /var/lib/rabbitmq rabbitmq-fips3.9.10 chown rabbitmq:rabbitmq -R /var/lib/rabbitmq/
 
 # Restart container
 docker restart rabbitmq-fips3.9.10
@@ -35,3 +36,10 @@ docker restart rabbitmq-fips3.9.10
 # Verify FIPS enabled in the kernel and openssl versions
 docker exec -u:0 rabbitmq-fips3.9.10 cat /proc/cmdline
 docker exec -u:0 rabbitmq-fips3.9.10 openssl version
+
+# Sleep for 5
+sleep 5;
+
+# Set FIPS mode
+docker exec -u:0 rabbitmq-fips3.9.10 rabbitmqctl eval 'crypto:enable_fips_mode(true).'
+docker exec -u:0 rabbitmq-fips3.9.10 rabbitmqctl eval 'crypto:info_fips().'
